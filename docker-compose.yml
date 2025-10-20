@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: course-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_USERNAME: "root"
+      MYSQL_ROOT_PASSWORD: "18022005"
+      MYSQL_DATABASE: "course"
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3310:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    container_name: course-app
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/course?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "18022005"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.MySQLDialect"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src/main/resources/templates:/app/templates:ro
+      - ./src/main/resources/static:/app/static:ro
+
+volumes:
+  db_data:

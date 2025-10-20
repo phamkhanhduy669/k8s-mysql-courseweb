@@ -16,12 +16,10 @@ spec:
     spec:
       containers:
         - name: course-app
-          # TODO: cập nhật tên image bạn build/push
           image: course-app:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
-          # Probes cơ bản (TCP) để check app sống/sẵn sàng
           livenessProbe:
             tcpSocket:
               port: 8080
